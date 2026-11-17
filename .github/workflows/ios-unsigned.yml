@@ -1,6 +1,13 @@
 name: Build iOS Device IPA (unsigned)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'www/**'
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/ios-unsigned.yml'
 permissions:
   contents: read
 jobs:
