@@ -43,3 +43,4 @@ jobs:
           name: Durusi-iOS-iPadOS-unsigned-IPA
           path: Durusi-unsigned.ipa
           if-no-files-found: error
+# Recovered project: trigger CI builds after restoration.
