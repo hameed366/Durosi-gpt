@@ -1,0 +1,26 @@
+{
+  "name": "durusi-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "دروسي - تطبيق iOS وAndroid وموقع PWA من قاعدة برمجية واحدة",
+  "scripts": {
+    "web:serve": "npx serve www",
+    "cap:sync": "npx cap sync",
+    "ios:open": "npx cap open ios",
+    "android:open": "npx cap open android",
+    "ios:run": "npx cap run ios",
+    "android:run": "npx cap run android",
+    "check": "node scripts/check.mjs",
+    "web:preview": "python3 -m http.server 8080 --directory www",
+    "android:apk:debug": "cd android && ./gradlew assembleDebug",
+    "android:aab:release": "cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/ios": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
+  }
+}
