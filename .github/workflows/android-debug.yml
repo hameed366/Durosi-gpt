@@ -23,7 +23,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      - name: Check Android SDK on hosted runner
+        run: |
+          test -d "$ANDROID_HOME" || { echo 'ANDROID_HOME is missing'; exit 1; }
+          echo "Android SDK: $ANDROID_HOME"
       - name: Install dependencies
         run: npm install
       - name: Validate web application
