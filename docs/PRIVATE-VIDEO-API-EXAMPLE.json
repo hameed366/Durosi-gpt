@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "status": "design-only",
+  "video": {
+    "id": "vid_example",
+    "lessonId": "lesson_example",
+    "title": "شرح الدرس",
+    "status": "ready",
+    "visibility": "private",
+    "published": false
+  },
+  "uploadIntentRequest": {
+    "lessonId": "lesson_example",
+    "filename": "lesson.mp4",
+    "contentType": "video/mp4",
+    "sizeBytes": 1000000
+  },
+  "uploadIntentResponse": {
+    "videoId": "vid_example",
+    "uploadUrl": "returned-by-server-short-lived"
+  },
+  "playbackRequest": {
+    "lessonId": "lesson_example"
+  },
+  "playbackResponse": {
+    "playbackUrl": "signed-short-lived-url-from-server",
+    "expiresInSeconds": 300
+  },
+  "error": {
+    "status": 403,
+    "code": "SUBSCRIPTION_REQUIRED"
+  }
+}
