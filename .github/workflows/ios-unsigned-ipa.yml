@@ -1,0 +1,63 @@
+name: Build iOS Device IPA (unsigned)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'www/**'
+      - 'package*.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/ios-unsigned-ipa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  unsigned-ipa:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check web project
+        run: npm run check
+      - name: Generate native iOS project
+        run: |
+          npx cap add ios
+          npx cap sync ios
+      - name: Build for physical iPhone and iPad (without signing)
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DurusiDerived" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+      - name: Package unsigned IPA for external signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/DurusiDerived/Build/Products/Release-iphoneos/App.app"
+          test -d "$APP" || { echo 'iOS device App.app not found'; exit 1; }
+          mkdir -p "$RUNNER_TEMP/ipa/Payload" artifacts
+          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/Durusi.app"
+          (cd "$RUNNER_TEMP/ipa" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/artifacts/Durusi-unsigned.ipa" Payload)
+          unzip -t artifacts/Durusi-unsigned.ipa | tail -1
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Durusi-iOS-iPadOS-unsigned-IPA
+          path: artifacts/Durusi-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
