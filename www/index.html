@@ -461,6 +461,7 @@ function vAccount(){
  <div class="card"><b style="font-family:var(--display)">ألوان المنصة ✦</b><div class="muted" style="font-size:14px">اختر الثيم اللي يعجبك</div>${skinGrid()}</div>
  ${standalone()?'':`<div class="card"><div class="switch"><div><b style="font-family:var(--display)">تثبيت التطبيق</b><div class="muted" style="font-size:14px">أضف دروسي إلى الشاشة الرئيسية ليعمل كتطبيق</div></div><button class="btn primary" data-act="install">تثبيت</button></div></div>`}
  ${S.teacher?`<div class="card"><b style="font-family:var(--display)">نشر المحتوى للطلاب</b><div class="muted" style="font-size:14px;margin-bottom:10px">نزّل ملف content.json وارفعه مكان الملف القديم في موقع المنصة، فيظهر المحتوى الجديد عند كل الطلاب.</div><div class="row" style="flex-wrap:wrap"><button class="btn primary" data-act="copyJson">نسخ المحتوى</button>${NATIVE?'':'<button class="btn" data-act="export">تنزيل content.json</button>'}</div></div>`:''}
+ <div class="card"><b style="font-family:var(--display)">النسخ الاحتياطي لبياناتك</b><div class="muted" style="font-size:14px;margin:8px 0 12px">احفظ نسخة من تقدمك وجدولك وتعديلاتك على جهازك. استعادة النسخة تستبدل بيانات دروسي الحالية على هذا الجهاز.</div><div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn primary" data-act="backupExport">تنزيل نسخة احتياطية</button><button class="btn" data-act="backupImport">استعادة نسخة</button></div><input id="backupFile" type="file" accept=".json,application/json" style="display:none" aria-label="اختيار نسخة دروسي الاحتياطية"></div>
  <div class="card"><a class="btn" style="width:100%" href="${siteLink('privacy.html')}">سياسة الخصوصية</a></div>
  <div class="card"><b style="font-family:var(--display)">إعادة ضبط التقدّم</b><div class="muted" style="font-size:14px;margin-bottom:10px">يمسح الدروس المكتملة والمحفوظات لهذا الصف</div><button class="btn" style="color:#fecaca" data-act="reset">${V.confirm==='reset'?'اضغط مرة أخرى للتأكيد':'إعادة الضبط'}</button></div>`;
 }
@@ -502,6 +503,20 @@ function render(){
 }
 function go(view,extra){Object.assign(V,{view,confirm:null},extra||{});closeSheet();render();window.scrollTo(0,0)}
 
+document.addEventListener('change',async e=>{
+ if(e.target.id!=='backupFile')return;
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ try{
+  if(file.size>5*1024*1024)throw Error('الملف كبير جدًا');
+  const obj=JSON.parse(await file.text());
+  if(obj.format!=='durusi-backup'||obj.version!==1||!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw Error('الملف ليس نسخة دروسي صالحة');
+  const d=obj.data;
+  if(typeof d.name!=='string'||!Number.isInteger(Number(d.grade))||Number(d.grade)<6||Number(d.grade)>12||!d.done||typeof d.done!=='object'||Array.isArray(d.done)||!d.marks||typeof d.marks!=='object'||Array.isArray(d.marks)||!d.custom||typeof d.custom!=='object'||Array.isArray(d.custom)||!d.teachers||typeof d.teachers!=='object'||Array.isArray(d.teachers)||!Array.isArray(d.schedule))throw Error('بيانات النسخة غير مكتملة');
+  if(!confirm('استعادة هذه النسخة ستستبدل بيانات دروسي الحالية على هذا الجهاز. هل تريد المتابعة؟'))return;
+  localStorage.setItem(KEY,JSON.stringify(d));location.reload();
+ }catch(err){toast('تعذرت الاستعادة: '+err.message)}
+ finally{e.target.value=''}
+});
 document.addEventListener('click',e=>{
  const el=e.target.closest('[data-act]'); if(!el)return;
  const a=el.dataset.act;
@@ -530,6 +545,14 @@ document.addEventListener('click',e=>{
   case 'skins':sheet(`<h2>ألوان المنصة ✦</h2><p class="muted" style="margin:0">اختر الثيم اللي يعجبك</p>${skinGrid()}`);break;
   case 'skin':{S.skin=el.dataset.v;save();applySkin();const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/3,34);document.querySelectorAll('.skin').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.skin));if(V.view==='account')render();break}
   case 'tmode':if(S.teacher){S.teacher=false;save();render();toast('تم إيقاف وضع المعلم')}else sheet(`<h2>وضع المعلم</h2><form id="pf"><label for="pin">الرقم السري</label><input id="pin" type="password" inputmode="numeric" required><p id="perr" class="muted" hidden style="color:#fca5a5">الرقم السري غير صحيح</p><button class="btn primary" style="width:100%;margin-top:16px">دخول</button></form>`);break;
+  case 'backupExport':{
+   const payload={format:'durusi-backup',version:1,createdAt:new Date().toISOString(),data:S};
+   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='durusi-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('تم إعداد النسخة الاحتياطية');break;
+  }
+  case 'backupImport':{
+   const file=document.getElementById('backupFile');if(file)file.click();break;
+  }
   case 'copyJson':{const txt=JSON.stringify({custom:Object.assign({},PUB.custom,S.custom),teachers:Object.assign({},PUB.teachers,S.teachers)});const fb=()=>{sheet(`<h2>انسخ المحتوى</h2><p class="muted" style="margin:0 0 8px">حدّد النص كله وانسخه، ثم الصقه في ملف content.json على GitHub.</p><textarea id="jtxt" rows="8" dir="ltr" readonly>${esc(txt)}</textarea>`);const t=document.getElementById('jtxt');t.focus();t.select()};try{navigator.clipboard.writeText(txt).then(()=>toast('تم النسخ – الصقه في content.json على GitHub'),fb)}catch(e){fb()}break}
   case 'export':{const data={custom:Object.assign({},PUB.custom,S.custom),teachers:Object.assign({},PUB.teachers,S.teachers)};const b=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='content.json';document.body.appendChild(a);a.click();a.remove();toast('تم تنزيل content.json');break}
   case 'install':if(installEvt){installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;render()})}else sheet(`<h2>تثبيت التطبيق</h2><div class="card"><b>آيفون (Safari)</b><p style="margin:4px 0 0">اضغط زر المشاركة <b>⬆</b> أسفل الشاشة، ثم «إضافة إلى الشاشة الرئيسية».</p></div><div class="card"><b>أندرويد (Chrome)</b><p style="margin:4px 0 0">اضغط القائمة ⋮ أعلى الشاشة، ثم «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</p></div>`);break;
