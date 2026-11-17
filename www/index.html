@@ -433,6 +433,8 @@ function vLesson(){
  const l=f.lesson,u=f.unit,done=isDone(l.id),mk=!!S.marks[S.grade+'|'+l.id];
  const prev=u.lessons[f.idx-1],next=u.lessons[f.idx+1];
  let media,pcls='player',ylink='';const em=l.url?embedOf(l.url):null;
+ if(l.access==='paid'){media=`<div><div class="pb">${ic('lock')}</div><b>درس مدفوع — الوصول محمي</b><div class="muted" style="font-size:13px;margin-top:8px">تحتاج المشاهدة إلى تسجيل دخول واشتراك فعّال. ربط خدمة الفيديو الخاصة قيد التجهيز.</div></div>`; }
+ else 
  if(em&&l.type!=='quiz'){pcls='player embed';/* YouTube embed works directly; do not redirect to an absent player.html */ylink=em.k==='yt'?`<a class="ylink" href="https://www.youtube.com/watch?v=${esc(em.id)}" target="_blank" rel="noopener">لا يعمل الفيديو؟ افتحه في يوتيوب</a>`:'';media=em.k==='file'?`<video src="${esc(em.src)}" controls playsinline preload="metadata"></video>`:`<iframe src="${esc(em.src)}" title="${esc(l.title)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`}
  else if(l.type==='quiz')media=`<div><div class="pb">${ic('quiz')}</div><b>${esc(l.title)}</b><div style="margin-top:12px"><button class="btn primary" data-act="quiz">ابدأ الاختبار</button></div></div>`;
  else if(l.url)media=`<div><div class="pb">${l.type==='pdf'?ic('file'):play}</div><a class="btn primary" href="${esc(l.url)}" target="_blank" rel="noopener">${l.type==='pdf'?'فتح الملف':'تشغيل الفيديو'} ${ic('link')}</a><div class="muted" style="font-size:13px;margin-top:8px">يفتح في نافذة جديدة</div></div>`;
@@ -490,7 +492,9 @@ function lessonForm(l){
  sheet(`<h2>${l?'تعديل الدرس':'درس جديد'}</h2><form id="lf"><label for="lt">عنوان الدرس</label><input id="lt" required value="${esc(l?.title||'')}">
  <label for="ly">النوع</label><select id="ly">${['video','pdf','quiz'].map(t=>`<option value="${t}" ${l?.type===t?'selected':''}>${typeName[t]}</option>`).join('')}</select>
  <label for="ld">المدة أو الحجم</label><input id="ld" value="${esc(l?.dur||'20 د')}">
- <label for="lu">الرابط: فيديو يوتيوب أو Vimeo، أو ملف من Google Drive</label><input id="lu" dir="ltr" placeholder="https://" value="${esc(l?.url||'')}">
+ <label for="lu">رابط المحتوى العام (YouTube / Vimeo / PDF)</label><input id="lu" dir="ltr" placeholder="https://" value="${esc(l?.url||'')}">
+ <label for="la">نوع الوصول</label><select id="la"><option value="free" ${l?.access!=='paid'?'selected':''}>مجاني / رابط عام</option><option value="paid" ${l?.access==='paid'?'selected':''}>مدفوع / فيديو خاص</option></select>
+ <p class="muted" style="font-size:13px">الدرس المدفوع لا يعرض رابطًا عامًا للطالب. يتطلب تفعيل الخادم الآمن وCloudflare Stream قبل المشاهدة أو النشر المدفوع.</p>
  <button class="btn primary" style="width:100%;margin-top:16px">حفظ</button></form>`);
 }
 
@@ -571,7 +575,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('submit',e=>{
  e.preventDefault();const f=e.target,sid=V.subj,$=id=>document.getElementById(id).value.trim();
  if(f.id==='uf'){const C=editable(sid);if(V.formU){C[V.sem].find(x=>x.id===V.formU).title=$('ut')}else{const id='c'+Date.now();C[V.sem].push({id,title:$('ut'),lessons:[]});V.open=id}V.formU=null;save();closeSheet();render()}
- if(f.id==='lf'){const C=editable(sid);const u=C[V.sem].find(x=>x.id===V.formL.u)||C[1].concat(C[2]).find(x=>x.id===V.formL.u);const data={title:$('lt'),type:$('ly'),dur:$('ld'),url:$('lu')};
+ if(f.id==='lf'){const C=editable(sid);const u=C[V.sem].find(x=>x.id===V.formL.u)||C[1].concat(C[2]).find(x=>x.id===V.formL.u);const access=$('la');const data={title:$('lt'),type:$('ly'),dur:$('ld'),url:access==='paid'?'':$('lu'),access};
   if(V.formL.id){Object.assign(u.lessons.find(l=>l.id===V.formL.id),data)}else u.lessons.push({id:'c'+Date.now(),...data});save();closeSheet();render();toast('تم حفظ الدرس')}
  if(f.id==='pf'){if($('pin')===TEACHER_PIN){S.teacher=true;save();closeSheet();render();toast('تم تفعيل وضع المعلم')}else document.getElementById('perr').hidden=false}
  if(f.id==='wf'){S.name=$('wn');S.grade=+$('wg');save();closeSheet();render()}
