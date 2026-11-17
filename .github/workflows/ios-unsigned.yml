@@ -29,7 +29,14 @@ jobs:
       - name: Build for physical iOS devices without signing
         run: |
           set -euo pipefail
-          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build 2>&1 | tee xcodebuild-device.log
+      - name: Upload Xcode build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Durusi-iOS-device-build-log
+          path: xcodebuild-device.log
+          if-no-files-found: ignore
       - name: Package unsigned IPA
         run: |
           set -euo pipefail
