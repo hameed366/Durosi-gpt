@@ -8,6 +8,7 @@ on:
       - 'package.json'
       - 'capacitor.config.ts'
       - '.github/workflows/android-debug.yml'
+      - '.github/workflows/ios-unsigned.yml'
 permissions:
   contents: read
 jobs:
