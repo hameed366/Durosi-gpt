@@ -26,10 +26,24 @@ jobs:
         run: npx cap add ios
       - name: Sync web assets
         run: npx cap sync ios
+      - name: Inspect generated Xcode workspace and schemes
+        run: |
+          ls -la ios/App
+          xcodebuild -list -workspace ios/App/App.xcworkspace
       - name: Build for physical iOS devices without signing
         run: |
           set -euo pipefail
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build 2>&1 | tee xcodebuild-device.log
+      - name: Show actionable Xcode errors on failure
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f xcodebuild-device.log ]; then
+            echo '=== Compiler and build errors ==='
+            grep -nEi '(^|[[:space:]])error:|fatal error:|BUILD FAILED|The following build commands failed|No such module|unable to|cannot find|not found' xcodebuild-device.log | tail -100 || true
+            echo '=== Last 100 lines ==='
+            tail -100 xcodebuild-device.log
+          fi
       - name: Upload Xcode build log on failure
         if: failure()
         uses: actions/upload-artifact@v4
