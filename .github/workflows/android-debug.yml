@@ -50,6 +50,10 @@ jobs:
             npx cap add android
           fi
           npx cap sync android
+      - name: Generate native app icon from approved Durusi branding
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts sharp
+          node scripts/generate-native-icons.cjs
       - name: Build debug APK
         shell: bash
         run: |
