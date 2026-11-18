@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06172e"/><stop offset="1" stop-color="#102e56"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff0b8"/><stop offset=".5" stop-color="#e9bc5b"/><stop offset="1" stop-color="#b67b22"/></linearGradient></defs>
+<rect width="512" height="512" rx="106" fill="url(#bg)"/><rect x="13" y="13" width="486" height="486" rx="94" fill="none" stroke="url(#gold)" stroke-width="10"/>
+<path d="M82 245 Q167 214 252 258 Q337 214 430 245 L416 344 Q334 312 256 357 Q174 312 96 344Z" fill="none" stroke="url(#gold)" stroke-width="17" stroke-linejoin="round"/>
+<path d="M256 258 V354 M112 274 Q188 258 239 288 M273 288 Q333 255 398 274" fill="none" stroke="#f9f4e7" stroke-width="12" stroke-linecap="round"/>
+<path d="M138 163 L256 112 L374 163 L256 213Z" fill="url(#gold)"/><path d="M188 190 V224 Q256 259 324 224 V190" fill="none" stroke="url(#gold)" stroke-width="15" stroke-linecap="round"/><path d="M372 165 V225" stroke="#f0cf85" stroke-width="9" stroke-linecap="round"/><circle cx="372" cy="233" r="12" fill="#f0cf85"/>
+<circle cx="256" cy="264" r="52" fill="#091c36" stroke="url(#gold)" stroke-width="9"/><path d="M244 239 L244 289 L283 264Z" fill="#fff9e9"/>
+<text x="256" y="432" text-anchor="middle" direction="rtl" font-family="Tajawal,Arial,sans-serif" font-size="75" font-weight="bold" fill="#fff8e8">دروسي</text>
+</svg>
