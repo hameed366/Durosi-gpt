@@ -15,6 +15,10 @@ jobs:
       - run: npm run check
       - run: npx cap add ios
       - run: npx cap sync ios
+      - name: Generate native app icon from approved Durusi branding
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts sharp
+          node scripts/generate-native-icons.cjs
       - name: Build simulator and capture diagnostic log
         shell: bash
         run: |
