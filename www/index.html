@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="دروسي">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="icon" type="image/svg+xml" href="durusi-icon.svg">\n<link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=Tajawal:wght@400;500;700;800&display=swap">
 <style>
@@ -501,7 +501,7 @@ function lessonForm(l){
 /* ---------- render ---------- */
 function render(){
  const map={home:vHome,subjects:vSubjects,subject:vSubject,lesson:vLesson,schedule:vSchedule,account:vAccount};
- document.getElementById('app').innerHTML=`<div class="brandbar"><div class="brandmark">د</div><div class="brandcopy"><b>دروسي</b><small>رحلتك نحو التفوق</small></div><span class="brandtag">منصتك التعليمية</span></div>${map[V.view]()}`;
+ document.getElementById('app').innerHTML=`<div class="brandbar"><div class="brandmark"><img src="durusi-icon.svg" alt="دروسي" style="width:100%;height:100%;object-fit:contain;border-radius:12px"></div><div class="brandcopy"><b>دروسي</b><small>رحلتك نحو التفوق</small></div><span class="brandtag">منصتك التعليمية</span></div>${map[V.view]()}`;
  const tab={home:'home',subject:'home',lesson:'home',subjects:'subjects',schedule:'schedule',account:'account'}[V.view];
  document.getElementById('nav').innerHTML=[['account','user','حسابي'],['schedule','cal','جدولي'],['subjects','grid','المواد'],['home','home','الرئيسية']].reverse().map(([v,i,t])=>`<button class="${tab===v?'on':''}" data-act="nav" data-v="${v}">${ic(i)}${t}</button>`).join('');
 }
