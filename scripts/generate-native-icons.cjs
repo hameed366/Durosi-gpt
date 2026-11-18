@@ -1,7 +1,9 @@
 // Render the approved Durusi SVG into generated native icon resources.
 // Run AFTER "npx cap sync" so native project assets exist.
 const fs=require('fs'),path=require('path'),sharp=require('sharp');
-const src=fs.readFileSync(path.join(__dirname,'../www/durusi-icon.svg'));
+const approved=path.join(__dirname,'../www/durusi-approved.png');
+if(!fs.existsSync(approved))throw Error('Missing approved icon: upload www/durusi-approved.png first');
+const src=fs.readFileSync(approved);
 async function png(file,size){await fs.promises.mkdir(path.dirname(file),{recursive:true});await sharp(src,{density:400}).resize(size,size).png().toFile(file);console.log('ICON',file,size)}
 (async()=>{
  const ios=path.join(__dirname,'../ios/App/App/Assets.xcassets/AppIcon.appiconset');
